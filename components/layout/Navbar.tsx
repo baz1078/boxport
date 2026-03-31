@@ -78,11 +78,13 @@ export function Navbar() {
                     <div className="px-2 py-1.5 text-sm font-medium">{session.user.name}</div>
                     <div className="px-2 pb-1.5 text-xs text-muted-foreground">{session.user.email}</div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild className="flex items-center gap-2 cursor-pointer">
-                      <a href="/dashboard"><LayoutDashboard className="h-4 w-4" />Dashboard</a>
+                    <DropdownMenuItem onClick={() => window.location.assign("/dashboard")} className="flex items-center gap-2 cursor-pointer">
+                      <LayoutDashboard className="h-4 w-4" />
+                      Dashboard
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="flex items-center gap-2 cursor-pointer">
-                      <a href="/dashboard/profile"><User className="h-4 w-4" />Profile</a>
+                    <DropdownMenuItem onClick={() => window.location.assign("/dashboard/profile")} className="flex items-center gap-2 cursor-pointer">
+                      <User className="h-4 w-4" />
+                      Profile
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
