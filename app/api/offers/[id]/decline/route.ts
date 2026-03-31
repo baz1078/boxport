@@ -1,0 +1,66 @@
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { offers, listings, notifications } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id: offerId } = await params;
+
+    const offer = await db.query.offers.findFirst({
+      where: eq(offers.id, offerId),
+    });
+
+    if (!offer) {
+      return NextResponse.json({ error: "Offer not found" }, { status: 404 });
+    }
+
+    if (offer.status !== "pending") {
+      return NextResponse.json(
+        { error: "Offer is no longer pending" },
+        { status: 400 }
+      );
+    }
+
+    // Verify seller owns the listing
+    const listing = await db.query.listings.findFirst({
+      where: eq(listings.id, offer.listingId),
+    });
+
+    if (!listing || listing.sellerId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Decline the offer
+    await db
+      .update(offers)
+      .set({ status: "declined", updatedAt: new Date() })
+      .where(eq(offers.id, offerId));
+
+    // Notify seller
+    await db.insert(notifications).values({
+      userId: session.user.id,
+      type: "offer_declined",
+      title: "Offer declined",
+      body: `You declined ${offer.buyerName}'s offer of $${Number(offer.amount).toLocaleString()} on "${listing.title}"`,
+      link: `/dashboard/offers`,
+    });
+
+    // In production: send email to buyer notifying them of decline
+    console.log(`[DECLINE] Buyer ${offer.buyerEmail} notified of decline`);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Decline offer error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
