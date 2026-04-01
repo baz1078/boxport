@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { offers, listings, notifications } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { sendOfferDeclinedEmail } from "@/lib/email";
 
 export async function POST(
   req: NextRequest,
@@ -55,8 +56,12 @@ export async function POST(
       link: `/dashboard/offers`,
     });
 
-    // In production: send email to buyer notifying them of decline
-    console.log(`[DECLINE] Buyer ${offer.buyerEmail} notified of decline`);
+    await sendOfferDeclinedEmail({
+      buyerEmail: offer.buyerEmail,
+      buyerName: offer.buyerName,
+      amount: Number(offer.amount),
+      listingTitle: listing.title,
+    }).catch((e) => console.error("Email error:", e));
 
     return NextResponse.json({ success: true });
   } catch (error) {

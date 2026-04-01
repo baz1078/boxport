@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { offers, listings, notifications } from "@/lib/db/schema";
+import { offers, listings, notifications, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { addHours } from "date-fns";
 import { OFFER_EXPIRY_HOURS } from "@/lib/constants/config";
+import { sendOfferReceivedEmail } from "@/lib/email";
 
 const submitOfferSchema = z.object({
   listingId: z.string().uuid(),
@@ -63,6 +64,21 @@ export async function POST(req: NextRequest) {
     await db.update(listings)
       .set({ inquiryCount: listing.inquiryCount + 1 })
       .where(eq(listings.id, data.listingId));
+
+    // Email seller
+    const seller = await db.query.users.findFirst({
+      where: eq(users.id, listing.sellerId),
+    });
+    if (seller?.email) {
+      await sendOfferReceivedEmail({
+        sellerEmail: seller.email,
+        sellerName: seller.name || "there",
+        buyerName: data.buyerName,
+        amount: data.amount,
+        listingTitle: listing.title,
+        message: data.message,
+      }).catch((e) => console.error("Email error:", e));
+    }
 
     return NextResponse.json({ success: true, offerId: newOffer.id }, { status: 201 });
   } catch (error) {

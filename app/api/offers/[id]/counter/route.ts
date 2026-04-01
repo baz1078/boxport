@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { addHours } from "date-fns";
 import { MAX_OFFER_ROUNDS, OFFER_EXPIRY_HOURS } from "@/lib/constants/config";
+import { sendCounterOfferEmail } from "@/lib/email";
 
 const counterSchema = z.object({
   amount: z.number().positive(),
@@ -96,10 +97,14 @@ export async function POST(
       link: `/dashboard/offers`,
     });
 
-    // In production: email buyer with counter offer details + link to respond
-    console.log(
-      `[COUNTER] Counter-offer ${counterOffer.id} sent to ${offer.buyerEmail} for $${amount}`
-    );
+    await sendCounterOfferEmail({
+      buyerEmail: offer.buyerEmail,
+      buyerName: offer.buyerName,
+      originalAmount: Number(offer.amount),
+      counterAmount: amount,
+      listingTitle: listing.title,
+      message,
+    }).catch((e) => console.error("Email error:", e));
 
     return NextResponse.json({ success: true, counterOfferId: counterOffer.id });
   } catch (error) {

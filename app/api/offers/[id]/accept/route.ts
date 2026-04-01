@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { offers, listings, notifications } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { SignJWT } from "jose";
+import { sendOfferAcceptedEmail } from "@/lib/email";
 
 const CHECKOUT_TOKEN_SECRET = new TextEncoder().encode(
   process.env.AUTH_SECRET || "fallback-secret-dev-only"
@@ -81,8 +82,13 @@ export async function POST(
       link: `/dashboard/offers`,
     });
 
-    // In production: send email to buyer via Resend with checkoutUrl
-    console.log(`[ACCEPT] Checkout link for ${offer.buyerEmail}: ${checkoutUrl}`);
+    await sendOfferAcceptedEmail({
+      buyerEmail: offer.buyerEmail,
+      buyerName: offer.buyerName,
+      amount: Number(offer.amount),
+      listingTitle: listing.title,
+      checkoutUrl,
+    }).catch((e) => console.error("Email error:", e));
 
     return NextResponse.json({ success: true, checkoutUrl });
   } catch (error) {
