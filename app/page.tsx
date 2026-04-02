@@ -123,7 +123,15 @@ export default async function HomePage() {
         </div>
 
         {featuredListings.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className={`grid gap-6 ${
+            featuredListings.length === 1
+              ? "grid-cols-1 max-w-sm mx-auto"
+              : featuredListings.length === 2
+              ? "grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto"
+              : featuredListings.length === 3
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          }`}>
             {featuredListings.map((listing) => (
               <ListingCard key={listing.id} listing={listing as any} />
             ))}
