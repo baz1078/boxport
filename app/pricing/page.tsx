@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://boxport.io/pricing" },
 };
 
-export const metadata = { title: "Pricing — BoxPort" };
 
 const FREE_FEATURES = [
   "Up to 3 active listings",
