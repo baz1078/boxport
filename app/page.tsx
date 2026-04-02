@@ -6,6 +6,14 @@ import { db } from "@/lib/db";
 import { listings } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { ListingCard } from "@/components/listings/ListingCard";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "BoxPort — Buy & Sell Shipping Containers in the US",
+  description:
+    "BoxPort is the safest way to buy and sell shipping containers in the US. Verified sellers, escrow-protected payments, and no hidden fees. Browse 20ft, 40ft, reefer, and high cube containers.",
+  alternates: { canonical: "https://boxport.io" },
+};
 
 async function getFeaturedListings() {
   try {

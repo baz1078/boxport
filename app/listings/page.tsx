@@ -8,6 +8,14 @@ import { CONTAINER_TYPES, CONTAINER_CONDITIONS } from "@/lib/constants/container
 import { US_STATES } from "@/lib/constants/states";
 import { SlidersHorizontal, Package } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Browse Shipping Containers for Sale",
+  description:
+    "Search shipping containers for sale across the US. Filter by size, condition, type, and location. 20ft, 40ft, reefer, high cube, and more from verified sellers.",
+  alternates: { canonical: "https://boxport.io/listings" },
+};
 import { ListingsFilter } from "@/components/listings/ListingsFilter";
 
 interface SearchParams {

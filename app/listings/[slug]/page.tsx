@@ -25,9 +25,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     where: eq(listings.slug, slug),
   });
   if (!listing) return { title: "Listing Not Found" };
+  const price = Number(listing.price).toLocaleString();
+  const typeLabel = CONTAINER_TYPE_LABELS[listing.containerType];
+  const description = `${typeLabel} for sale in ${listing.city}, ${listing.state} — $${price}. ${listing.description?.slice(0, 120) ?? ""}`;
   return {
-    title: listing.title,
-    description: `${CONTAINER_TYPE_LABELS[listing.containerType]} in ${listing.city}, ${listing.state} — $${Number(listing.price).toLocaleString()}`,
+    title: `${listing.title} — ${listing.city}, ${listing.state}`,
+    description,
+    alternates: { canonical: `https://boxport.io/listings/${slug}` },
+    openGraph: {
+      title: listing.title,
+      description,
+      url: `https://boxport.io/listings/${slug}`,
+      images: listing.images?.[0] ? [{ url: listing.images[0].url }] : [],
+      type: "website",
+    },
   };
 }
 
@@ -63,8 +74,33 @@ export default async function ListingDetailPage({ params }: PageProps) {
     { label: "Listed", value: formatDate(listing.createdAt) },
   ].filter((s) => s.value && s.value !== "Not specified");
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: listing.title,
+    description: listing.description ?? undefined,
+    image: listing.images.map((i) => i.url),
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "USD",
+      price: Number(listing.price).toFixed(2),
+      availability: listing.status === "active"
+        ? "https://schema.org/InStock"
+        : "https://schema.org/SoldOut",
+      url: `https://boxport.io/listings/${listing.slug}`,
+      seller: {
+        "@type": "Organization",
+        name: "BoxPort",
+      },
+    },
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left: Images + Details */}
         <div className="lg:col-span-2 space-y-6">

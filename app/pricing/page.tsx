@@ -3,6 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, Zap, Shield, DollarSign } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Pricing — Free to List, 4.9% on Sales",
+  description:
+    "BoxPort is free to list containers. We only charge a 4.9% platform fee when your container sells. No monthly fees, no hidden costs.",
+  alternates: { canonical: "https://boxport.io/pricing" },
+};
 
 export const metadata = { title: "Pricing — BoxPort" };
 

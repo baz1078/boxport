@@ -18,12 +18,47 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "BoxPort — Shipping Container Marketplace",
+    default: "BoxPort — Buy & Sell Shipping Containers",
     template: "%s | BoxPort",
   },
   description:
-    "Buy and sell shipping containers with confidence. Browse 20ft, 40ft, reefer, and specialty containers from verified sellers across the US.",
-  keywords: ["shipping containers", "buy containers", "sell containers", "container marketplace"],
+    "BoxPort is the trusted US marketplace to buy and sell shipping containers. Browse 20ft, 40ft, reefer, and high cube containers from verified sellers with secure escrow payments.",
+  keywords: [
+    "shipping containers for sale",
+    "buy shipping container",
+    "sell shipping container",
+    "used shipping containers",
+    "20ft shipping container",
+    "40ft shipping container",
+    "reefer container",
+    "high cube container",
+    "shipping container marketplace",
+    "container for sale near me",
+  ],
+  metadataBase: new URL("https://boxport.io"),
+  openGraph: {
+    type: "website",
+    siteName: "BoxPort",
+    title: "BoxPort — Buy & Sell Shipping Containers",
+    description:
+      "The trusted US marketplace to buy and sell shipping containers. Verified sellers, secure escrow, no shady deals.",
+    url: "https://boxport.io",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BoxPort — Shipping Container Marketplace" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BoxPort — Buy & Sell Shipping Containers",
+    description: "The trusted US marketplace to buy and sell shipping containers.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  alternates: {
+    canonical: "https://boxport.io",
+  },
 };
 
 export default function RootLayout({
