@@ -8,6 +8,8 @@ import { eq, desc } from "drizzle-orm";
 import { ListingCard } from "@/components/listings/ListingCard";
 import type { Metadata } from "next";
 
+export const revalidate = 60; // Refresh every 60 seconds
+
 export const metadata: Metadata = {
   title: "BoxPort — Buy & Sell Shipping Containers in the US",
   description:
