@@ -36,7 +36,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: listing.title,
       description,
       url: `https://boxport.io/listings/${slug}`,
-      images: listing.images?.[0] ? [{ url: listing.images[0].url }] : [],
       type: "website",
     },
   };
