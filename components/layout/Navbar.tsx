@@ -50,16 +50,14 @@ export function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-64 p-2">
                 {BROWSE_CATEGORIES.map(({ href, label, sub, Icon }) => (
-                  <DropdownMenuItem key={href} asChild>
-                    <Link href={href} className="flex items-start gap-3 px-2 py-2.5 rounded-md cursor-pointer">
-                      <div className="w-8 h-8 bg-muted rounded-md flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Icon className="h-4 w-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{label}</p>
-                        <p className="text-xs text-muted-foreground">{sub}</p>
-                      </div>
-                    </Link>
+                  <DropdownMenuItem key={href} onClick={() => window.location.assign(href)} className="flex items-start gap-3 px-2 py-2.5 rounded-md cursor-pointer">
+                    <div className="w-8 h-8 bg-muted rounded-md flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Icon className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{label}</p>
+                      <p className="text-xs text-muted-foreground">{sub}</p>
+                    </div>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
