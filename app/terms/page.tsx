@@ -36,7 +36,7 @@ export default function TermsPage() {
                 <li>Sellers must provide accurate, complete, and honest listings. Misrepresenting container condition, size, or availability is grounds for immediate account termination.</li>
                 <li>Sellers are responsible for ensuring containers are available and transferable at the time of sale.</li>
                 <li>Sellers must fulfill confirmed orders in a timely manner and cooperate with the buyer on logistics.</li>
-                <li>BoxPort charges a 4.9% platform fee on completed transactions, deducted from the seller's payout.</li>
+                <li>BoxPort charges a flat success fee on completed transactions, deducted from the seller's payout. Current rates are listed on the Pricing page.</li>
                 <li>Sellers must complete identity verification before receiving payouts.</li>
               </ul>
             </div>

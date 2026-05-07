@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle, Shield, Clock } from "lucide-react";
+import { CheckCircle, Shield, Clock, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfirmReceiptButton } from "@/components/checkout/ConfirmReceiptButton";
 
@@ -61,6 +61,20 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
               auto-release after 7 days.
             </p>
           )}
+        </div>
+
+        {/* Delivery nudge */}
+        <div className="bg-muted/40 border border-border rounded-xl p-4 text-left flex items-start gap-3">
+          <Truck className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold">Need help with delivery?</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Find verified container haulers in your area on BoxPort Logistics.
+            </p>
+            <Link href="/logistics" className="text-xs font-medium text-primary hover:underline mt-1 inline-block">
+              Browse carriers →
+            </Link>
+          </div>
         </div>
 
         <div className="flex gap-3">

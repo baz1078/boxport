@@ -11,8 +11,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, X, Package, ChevronDown, LayoutDashboard, LogOut, User } from "lucide-react";
+import { Menu, X, Package, ChevronDown, LayoutDashboard, LogOut, User, Star, Wrench, CalendarClock, LayoutList } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
+
+const BROWSE_CATEGORIES = [
+  { href: "/listings?category=new", label: "New Containers", sub: "One-trip, factory-fresh", Icon: Star },
+  { href: "/listings?category=used", label: "Used Containers", sub: "Cargo worthy, WWT, As-Is", Icon: Wrench },
+  { href: "/listings?category=rent-to-own", label: "Rent-to-Own", sub: "Monthly payments → ownership", Icon: CalendarClock },
+  { href: "/listings", label: "All Containers", sub: "Browse everything", Icon: LayoutList },
+] as const;
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -37,11 +44,31 @@ export function Navbar() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none">
+                Browse <ChevronDown className="h-3.5 w-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-64 p-2">
+                {BROWSE_CATEGORIES.map(({ href, label, sub, Icon }) => (
+                  <DropdownMenuItem key={href} asChild>
+                    <Link href={href} className="flex items-start gap-3 px-2 py-2.5 rounded-md cursor-pointer">
+                      <div className="w-8 h-8 bg-muted rounded-md flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Icon className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{label}</p>
+                        <p className="text-xs text-muted-foreground">{sub}</p>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Link
-              href="/listings"
+              href="/logistics"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Browse Containers
+              Logistics
             </Link>
             <Link
               href="/pricing"
@@ -126,14 +153,27 @@ export function Navbar() {
       {/* Mobile Menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-background">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3">
-            <Link href="/listings" className="text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>
-              Browse Containers
+          <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1">Browse</p>
+            {BROWSE_CATEGORIES.map(({ href, label, Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className="flex items-center gap-2.5 text-sm font-medium py-2 px-2 rounded-md hover:bg-muted"
+                onClick={() => setMobileOpen(false)}
+              >
+                <Icon className="h-4 w-4 text-primary" />
+                {label}
+              </Link>
+            ))}
+            <div className="border-t border-border my-1" />
+            <Link href="/logistics" className="text-sm font-medium py-2 px-2" onClick={() => setMobileOpen(false)}>
+              Logistics
             </Link>
-            <Link href="/pricing" className="text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>
+            <Link href="/pricing" className="text-sm font-medium py-2 px-2" onClick={() => setMobileOpen(false)}>
               Pricing
             </Link>
-            <Link href="/how-it-works" className="text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>
+            <Link href="/how-it-works" className="text-sm font-medium py-2 px-2" onClick={() => setMobileOpen(false)}>
               How It Works
             </Link>
             <div className="pt-2 border-t border-border flex flex-col gap-2">

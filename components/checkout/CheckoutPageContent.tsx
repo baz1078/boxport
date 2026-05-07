@@ -101,7 +101,7 @@ export function CheckoutPageContent() {
             <span className="font-medium">{formatCurrency(checkoutData.amount)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Platform Fee (4.9%)</span>
+            <span className="text-muted-foreground">Buyer Protection Fee</span>
             <span className="font-medium">{formatCurrency(checkoutData.platformFee)}</span>
           </div>
           <div className="border-t border-border mt-2 pt-2 flex justify-between font-bold">

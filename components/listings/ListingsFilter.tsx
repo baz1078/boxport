@@ -15,6 +15,7 @@ interface ListingsFilterProps {
     min?: string;
     max?: string;
     sort?: string;
+    category?: string;
   };
 }
 
@@ -62,31 +63,34 @@ export function ListingsFilter({ currentParams }: ListingsFilterProps) {
         </div>
       </div>
 
-      <Separator />
-
-      <div>
-        <h2 className="font-semibold text-sm mb-3">Condition</h2>
-        <div className="space-y-2">
-          {CONTAINER_CONDITIONS.map((cond) => (
-            <button
-              key={cond.value}
-              onClick={() =>
-                updateFilter(
-                  "condition",
-                  currentParams.condition === cond.value ? undefined : cond.value
-                )
-              }
-              className={`w-full text-left text-sm px-3 py-1.5 rounded-md transition-colors ${
-                currentParams.condition === cond.value
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted text-foreground"
-              }`}
-            >
-              {cond.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      {currentParams.category !== "rent-to-own" && currentParams.category !== "new" && currentParams.category !== "used" && (
+        <>
+          <Separator />
+          <div>
+            <h2 className="font-semibold text-sm mb-3">Condition</h2>
+            <div className="space-y-2">
+              {CONTAINER_CONDITIONS.map((cond) => (
+                <button
+                  key={cond.value}
+                  onClick={() =>
+                    updateFilter(
+                      "condition",
+                      currentParams.condition === cond.value ? undefined : cond.value
+                    )
+                  }
+                  className={`w-full text-left text-sm px-3 py-1.5 rounded-md transition-colors ${
+                    currentParams.condition === cond.value
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted text-foreground"
+                  }`}
+                >
+                  {cond.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       <Separator />
 

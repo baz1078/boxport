@@ -1,14 +1,15 @@
 import { db } from "@/lib/db";
 import { listings } from "@/lib/db/schema";
-import { eq, and, gte, lte, desc, asc } from "drizzle-orm";
+import { eq, and, gte, lte, desc, asc, inArray } from "drizzle-orm";
 import { ListingCard } from "@/components/listings/ListingCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CONTAINER_TYPES, CONTAINER_CONDITIONS } from "@/lib/constants/containers";
+import { CONTAINER_TYPES, CONTAINER_CONDITIONS, NEW_CONDITIONS, USED_CONDITIONS } from "@/lib/constants/containers";
 import { US_STATES } from "@/lib/constants/states";
-import { SlidersHorizontal, Package } from "lucide-react";
+import { Package, Star, Wrench, CalendarClock, LayoutList } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ListingsFilter } from "@/components/listings/ListingsFilter";
 
 export const metadata: Metadata = {
   title: "Browse Shipping Containers for Sale",
@@ -16,7 +17,13 @@ export const metadata: Metadata = {
     "Search shipping containers for sale across the US. Filter by size, condition, type, and location. 20ft, 40ft, reefer, high cube, and more from verified sellers.",
   alternates: { canonical: "https://boxport.io/listings" },
 };
-import { ListingsFilter } from "@/components/listings/ListingsFilter";
+
+const CATEGORY_TABS = [
+  { value: "all", label: "All Containers", Icon: LayoutList },
+  { value: "new", label: "New", Icon: Star },
+  { value: "used", label: "Used", Icon: Wrench },
+  { value: "rent-to-own", label: "Rent-to-Own", Icon: CalendarClock },
+] as const;
 
 interface SearchParams {
   type?: string;
@@ -26,6 +33,7 @@ interface SearchParams {
   max?: string;
   sort?: string;
   page?: string;
+  category?: string;
 }
 
 const PAGE_SIZE = 12;
@@ -36,6 +44,17 @@ async function getListings(params: SearchParams) {
 
   try {
     const conditions = [eq(listings.status, "active")];
+
+    // Category filter
+    if (params.category === "new") {
+      conditions.push(eq(listings.listingType, "sale"));
+      conditions.push(inArray(listings.condition, [...NEW_CONDITIONS]));
+    } else if (params.category === "used") {
+      conditions.push(eq(listings.listingType, "sale"));
+      conditions.push(inArray(listings.condition, [...USED_CONDITIONS]));
+    } else if (params.category === "rent-to-own") {
+      conditions.push(eq(listings.listingType, "rent_to_own"));
+    }
 
     if (params.type) {
       conditions.push(eq(listings.containerType, params.type as any));
@@ -87,8 +106,45 @@ export default async function ListingsPage({
     params.max && `Up to $${Number(params.max).toLocaleString()}`,
   ].filter(Boolean) as string[];
 
+  const activeCategory = params.category ?? "all";
+
+  const categoryTitles: Record<string, { title: string; sub: string }> = {
+    all: { title: "All Containers", sub: "Browse all available listings" },
+    new: { title: "New Containers", sub: "One-trip, factory-fresh units" },
+    used: { title: "Used Containers", sub: "Cargo worthy, WWT, and as-is units" },
+    "rent-to-own": { title: "Rent-to-Own Containers", sub: "Own it over time with monthly payments" },
+  };
+  const { title: pageTitle, sub: pageSub } = categoryTitles[activeCategory] ?? categoryTitles.all;
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div>
+      {/* Category Tab Bar */}
+      <div className="border-b border-border bg-card">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-1 overflow-x-auto">
+            {CATEGORY_TABS.map(({ value, label, Icon }) => {
+              const isActive = activeCategory === value;
+              const href = value === "all" ? "/listings" : `/listings?category=${value}`;
+              return (
+                <Link
+                  key={value}
+                  href={href}
+                  className={`flex items-center gap-1.5 text-sm font-medium px-4 py-3.5 border-b-2 transition-colors whitespace-nowrap ${
+                    isActive
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex gap-8">
         {/* Sidebar Filters */}
         <aside className="hidden lg:block w-64 flex-shrink-0">
@@ -100,9 +156,9 @@ export default async function ListingsPage({
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold">Shipping Containers</h1>
+              <h1 className="text-2xl font-bold">{pageTitle}</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                {results.length} listing{results.length !== 1 ? "s" : ""} found
+                {pageSub} · {results.length} listing{results.length !== 1 ? "s" : ""} found
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -150,6 +206,7 @@ export default async function ListingsPage({
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

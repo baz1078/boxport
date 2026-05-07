@@ -8,6 +8,24 @@ export const CONTAINER_TYPES = [
   { value: "tank", label: "Tank Container" },
 ] as const;
 
+export const LISTING_TYPES = [
+  {
+    value: "sale",
+    label: "For Sale",
+    description: "One-time purchase at listed price",
+  },
+  {
+    value: "rent_to_own",
+    label: "Rent-to-Own",
+    description: "Monthly payments leading to full ownership",
+  },
+] as const;
+
+export type ListingType = (typeof LISTING_TYPES)[number]["value"];
+
+export const NEW_CONDITIONS = ["one_trip"] as const;
+export const USED_CONDITIONS = ["cargo_worthy", "wind_water_tight", "as_is"] as const;
+
 export const CONTAINER_CONDITIONS = [
   {
     value: "one_trip",

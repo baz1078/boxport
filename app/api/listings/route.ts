@@ -2,13 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { listings, listingImages, userProfiles } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { generateSlug } from "@/lib/utils/formatters";
 import { FREE_TIER_LISTING_LIMIT } from "@/lib/constants/config";
+import { NEW_CONDITIONS, USED_CONDITIONS } from "@/lib/constants/containers";
 
 const createListingSchema = z.object({
   title: z.string().min(5).max(100),
+  listingType: z.enum(["sale", "rent_to_own"]).default("sale"),
   containerType: z.string(),
   condition: z.string(),
   price: z.number().positive(),
@@ -20,6 +22,9 @@ const createListingSchema = z.object({
   state: z.string(),
   zip: z.string(),
   yearManufactured: z.number().optional(),
+  rtoMonthlyPayment: z.number().optional(),
+  rtoTermMonths: z.number().optional(),
+  rtoDownPayment: z.number().optional(),
   images: z.array(z.object({ url: z.string(), key: z.string() })),
 });
 
@@ -70,6 +75,7 @@ export async function POST(req: NextRequest) {
         sellerId: session.user.id,
         title: data.title,
         slug,
+        listingType: data.listingType,
         containerType: data.containerType as any,
         condition: data.condition as any,
         price: data.price.toString(),
@@ -81,6 +87,9 @@ export async function POST(req: NextRequest) {
         state: data.state,
         zip: data.zip,
         yearManufactured: data.yearManufactured,
+        rtoMonthlyPayment: data.rtoMonthlyPayment?.toString(),
+        rtoTermMonths: data.rtoTermMonths,
+        rtoDownPayment: data.rtoDownPayment?.toString(),
         status: "active",
       })
       .returning();
@@ -116,11 +125,23 @@ export async function GET(req: NextRequest) {
   const type = searchParams.get("type");
   const condition = searchParams.get("condition");
   const state = searchParams.get("state");
+  const category = searchParams.get("category");
   const page = Number(searchParams.get("page") ?? 1);
   const limit = Number(searchParams.get("limit") ?? 12);
 
   try {
     const conditions = [eq(listings.status, "active")];
+
+    if (category === "new") {
+      conditions.push(eq(listings.listingType, "sale"));
+      conditions.push(inArray(listings.condition, [...NEW_CONDITIONS]));
+    } else if (category === "used") {
+      conditions.push(eq(listings.listingType, "sale"));
+      conditions.push(inArray(listings.condition, [...USED_CONDITIONS]));
+    } else if (category === "rent-to-own") {
+      conditions.push(eq(listings.listingType, "rent_to_own"));
+    }
+
     if (type) conditions.push(eq(listings.containerType, type as any));
     if (condition) conditions.push(eq(listings.condition, condition as any));
     if (state) conditions.push(eq(listings.state, state));

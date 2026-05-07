@@ -1,127 +1,136 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Check, Zap, Shield, DollarSign } from "lucide-react";
+import { Check, Shield, Zap, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pricing — Free to List, 4.9% on Sales",
+  title: "Pricing — BoxPort Container Marketplace",
   description:
-    "BoxPort is free to list containers. We only charge a 4.9% platform fee when your container sells. No monthly fees, no hidden costs.",
+    "Free to list on BoxPort. Pay a small flat fee only when your container sells. No monthly fees, no hidden costs.",
   alternates: { canonical: "https://boxport.io/pricing" },
 };
 
-
-const FREE_FEATURES = [
-  "Up to 3 active listings",
-  "Offer & counter-offer system",
-  "Secure escrow on every sale",
-  "Buyer inquiries & messaging",
-  "Standard listing placement",
-  "No monthly fee",
-];
-
-const PRO_FEATURES = [
-  "Unlimited active listings",
-  "Priority listing placement",
-  "Offer & counter-offer system",
-  "Secure escrow on every sale",
-  "Buyer inquiries & messaging",
-  "1 free featured boost per month",
-  "Bulk listing tools (coming soon)",
-  "Priority seller support",
+const SELLER_FEES = [
+  {
+    category: "Used Containers",
+    sub: "Cargo Worthy · Wind & Water Tight · As-Is",
+    fee: "$49",
+    detail: "flat per sale",
+    example: "$2,000 sale → you keep $1,951",
+  },
+  {
+    category: "New Containers",
+    sub: "One-Trip · Factory Fresh",
+    fee: "$69",
+    detail: "flat per sale (or 1.5%, whichever is greater)",
+    example: "$4,000 sale → you keep $3,931",
+  },
+  {
+    category: "Rent-to-Own",
+    sub: "Monthly payment plans",
+    fee: "$99",
+    detail: "flat per completed deal",
+    example: "Deal closes → you keep the difference",
+  },
 ];
 
 export default function PricingPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+
       {/* Header */}
       <div className="text-center space-y-4">
-        <Badge className="bg-accent/10 text-accent border-accent/20">Simple, transparent pricing</Badge>
-        <h1 className="text-4xl font-bold">Pay only when you sell</h1>
+        <h1 className="text-4xl font-bold">Free to list. Pay only when you sell.</h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          No hidden fees. BoxPort takes a small 4.9% platform fee per completed transaction —
-          only when a sale goes through. Everything else is free or flat-rate.
+          No monthly fees. No upfront costs. List your containers for free and pay a small flat
+          fee only when a deal closes.
         </p>
       </div>
 
-      {/* Plans */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-        {/* Free */}
-        <Card className="border-2">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl">Free</CardTitle>
-            <p className="text-4xl font-bold">$0<span className="text-base font-normal text-muted-foreground">/mo</span></p>
-            <p className="text-sm text-muted-foreground">For casual or occasional sellers</p>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <ul className="space-y-2.5">
-              {FREE_FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/auth/register">Get Started Free</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Pro */}
-        <Card className="border-2 border-primary relative">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-            <Badge className="bg-primary text-primary-foreground px-3">Most Popular</Badge>
-          </div>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl flex items-center gap-2">
-              Pro <Zap className="h-4 w-4 text-accent" />
-            </CardTitle>
-            <p className="text-4xl font-bold">$49<span className="text-base font-normal text-muted-foreground">/mo</span></p>
-            <p className="text-sm text-muted-foreground">For volume sellers & dealers</p>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <ul className="space-y-2.5">
-              {PRO_FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-              <Link href="/auth/register">Start Pro Trial</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Transaction Fee */}
-      <div className="bg-muted/40 rounded-2xl p-8 max-w-3xl mx-auto text-center space-y-3">
-        <div className="flex items-center justify-center gap-2 text-2xl font-bold">
-          <DollarSign className="h-6 w-6 text-accent" />
-          4.9% Transaction Fee
+      {/* Two-column: seller vs buyer */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-muted/40 rounded-2xl p-8 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">For Sellers</p>
+          <p className="text-3xl font-bold">$0 to list</p>
+          <ul className="space-y-2.5">
+            {[
+              "Create your account for free",
+              "List up to 3 containers at no cost",
+              "Offer & counter-offer system included",
+              "Pay a flat fee only when you sell",
+              "No monthly fees — ever",
+            ].map((f) => (
+              <li key={f} className="flex items-start gap-2 text-sm">
+                <Check className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                {f}
+              </li>
+            ))}
+          </ul>
+          <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Link href="/auth/register">Start Selling Free <ArrowRight className="ml-2 h-4 w-4" /></Link>
+          </Button>
         </div>
-        <p className="text-muted-foreground">
-          Applied on every completed sale. This covers payment processing, escrow protection,
-          and platform operations. Only charged when a deal closes — never on offers or listings.
-        </p>
-        <div className="text-sm text-muted-foreground pt-2">
-          Example: $5,000 container sale → you receive <strong>$4,755</strong> · BoxPort fee: $245
+
+        <div className="bg-muted/40 rounded-2xl p-8 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">For Buyers</p>
+          <p className="text-3xl font-bold">2.9% + $0.30</p>
+          <p className="text-sm text-muted-foreground">
+            A small buyer protection fee is added at checkout. Your payment is held in escrow
+            and only released to the seller once you confirm the container arrived as described.
+          </p>
+          <div className="bg-background border border-border rounded-lg px-4 py-3 text-sm text-muted-foreground">
+            Example: $2,000 container → buyer pays <strong className="text-foreground">$2,058.30</strong> total
+          </div>
+          <ul className="space-y-2.5">
+            {[
+              "Funds held in escrow until you confirm receipt",
+              "Disputes handled by BoxPort",
+              "Verified buyers and sellers only",
+            ].map((f) => (
+              <li key={f} className="flex items-start gap-2 text-sm">
+                <Check className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                {f}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Seller success fee table */}
+      <div className="space-y-4">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">Seller Success Fees</h2>
+          <p className="text-sm text-muted-foreground mt-2">
+            Only charged when your container sells. Never on listings, offers, or messages.
+          </p>
+        </div>
+        <div className="divide-y divide-border border border-border rounded-2xl overflow-hidden">
+          {SELLER_FEES.map((row) => (
+            <div key={row.category} className="flex items-center justify-between px-6 py-5 bg-card">
+              <div>
+                <p className="font-semibold">{row.category}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{row.sub}</p>
+                <p className="text-xs text-muted-foreground mt-1.5 italic">{row.example}</p>
+              </div>
+              <div className="text-right flex-shrink-0 ml-8">
+                <p className="text-2xl font-bold">{row.fee}</p>
+                <p className="text-xs text-muted-foreground">{row.detail}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Featured Boost */}
-      <div className="border border-border rounded-2xl p-8 max-w-3xl mx-auto flex flex-col sm:flex-row items-center gap-6">
-        <div className="h-14 w-14 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
-          <Zap className="h-7 w-7 text-accent" />
+      <div className="border border-border rounded-2xl p-8 flex flex-col sm:flex-row items-center gap-6">
+        <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+          <Zap className="h-6 w-6 text-accent" />
         </div>
         <div className="flex-1 text-center sm:text-left">
           <h3 className="font-bold text-lg">Featured Listing Boost</h3>
           <p className="text-muted-foreground text-sm mt-1">
-            Pin any listing to the top of search results for 30 days. Get significantly more views and inquiries.
+            Pin your listing to the top of search results for 30 days. More views, more inquiries,
+            faster sales.
           </p>
         </div>
         <div className="text-center flex-shrink-0">
@@ -130,7 +139,7 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Trust */}
+      {/* Trust footer */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <Shield className="h-4 w-4 text-emerald-600" />
@@ -140,6 +149,7 @@ export default function PricingPage() {
           Questions? <Link href="/how-it-works" className="text-primary underline">See how it works</Link>
         </p>
       </div>
+
     </div>
   );
 }

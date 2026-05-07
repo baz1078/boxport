@@ -12,13 +12,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CONTAINER_TYPES, CONTAINER_CONDITIONS } from "@/lib/constants/containers";
+import { CONTAINER_TYPES, CONTAINER_CONDITIONS, LISTING_TYPES } from "@/lib/constants/containers";
 import { US_STATES } from "@/lib/constants/states";
 import { ImageUploader } from "@/components/shared/ImageUploader";
 import { Loader2, Info } from "lucide-react";
 
 const listingSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").max(100),
+  listingType: z.enum(["sale", "rent_to_own"]).default("sale"),
   containerType: z.string().min(1, "Please select a container type"),
   condition: z.string().min(1, "Please select a condition"),
   price: z.string().min(1, "Price is required").refine((v) => !isNaN(Number(v)) && Number(v) > 0, "Price must be greater than 0"),
@@ -30,6 +31,9 @@ const listingSchema = z.object({
   state: z.string().min(2, "State is required"),
   zip: z.string().regex(/^\d{5}$/, "Enter a valid 5-digit ZIP code"),
   yearManufactured: z.string().optional(),
+  rtoMonthlyPayment: z.string().optional(),
+  rtoTermMonths: z.string().optional(),
+  rtoDownPayment: z.string().optional(),
 });
 
 type ListingFormData = z.infer<typeof listingSchema>;
@@ -58,12 +62,15 @@ export function ListingForm({ sellerId, initialData, mode = "create" }: ListingF
     defaultValues: {
       allowOffers: initialData?.allowOffers ?? true,
       buyNowEnabled: initialData?.buyNowEnabled ?? true,
+      listingType: (initialData as any)?.listingType ?? "sale",
       containerType: initialData?.containerType ?? "",
       condition: initialData?.condition ?? "",
       state: initialData?.state ?? "",
       ...initialData,
     },
   });
+
+  const listingType = watch("listingType");
 
   const onSubmit = async (data: ListingFormData) => {
     if (uploadedImages.length === 0) {
@@ -83,6 +90,9 @@ export function ListingForm({ sellerId, initialData, mode = "create" }: ListingF
           ...data,
           price: Number(data.price),
           yearManufactured: data.yearManufactured ? Number(data.yearManufactured) : undefined,
+          rtoMonthlyPayment: data.rtoMonthlyPayment ? Number(data.rtoMonthlyPayment) : undefined,
+          rtoTermMonths: data.rtoTermMonths ? Number(data.rtoTermMonths) : undefined,
+          rtoDownPayment: data.rtoDownPayment ? Number(data.rtoDownPayment) : undefined,
           images: uploadedImages,
         }),
       });
@@ -105,6 +115,33 @@ export function ListingForm({ sellerId, initialData, mode = "create" }: ListingF
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Listing Type */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Listing Type <span className="text-destructive">*</span></CardTitle>
+          <p className="text-sm text-muted-foreground">Choose how you want to sell this container.</p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {LISTING_TYPES.map((lt) => (
+              <button
+                key={lt.value}
+                type="button"
+                onClick={() => setValue("listingType", lt.value as "sale" | "rent_to_own")}
+                className={`text-left p-4 rounded-lg border-2 transition-all ${
+                  listingType === lt.value
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                }`}
+              >
+                <p className="font-semibold text-sm">{lt.label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{lt.description}</p>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Photos */}
       <Card>
         <CardHeader>
@@ -206,7 +243,10 @@ export function ListingForm({ sellerId, initialData, mode = "create" }: ListingF
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="price">Asking Price (USD) <span className="text-destructive">*</span></Label>
+            <Label htmlFor="price">
+              {listingType === "rent_to_own" ? "Container Value (USD)" : "Asking Price (USD)"}
+              <span className="text-destructive"> *</span>
+            </Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
               <Input
@@ -220,7 +260,7 @@ export function ListingForm({ sellerId, initialData, mode = "create" }: ListingF
             {errors.price && <p className="text-xs text-destructive">{errors.price.message}</p>}
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Info className="h-3 w-3" />
-              A 4.9% platform fee will be deducted from your payout at time of sale.
+              A flat success fee is deducted from your payout when the sale closes.
             </div>
           </div>
 
@@ -250,6 +290,60 @@ export function ListingForm({ sellerId, initialData, mode = "create" }: ListingF
           </div>
         </CardContent>
       </Card>
+
+      {/* Rent-to-Own Terms */}
+      {listingType === "rent_to_own" && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Rent-to-Own Terms <span className="text-destructive">*</span></CardTitle>
+            <p className="text-sm text-muted-foreground">Set the monthly payment, term length, and optional down payment. The price above is the container's total value.</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="rtoMonthlyPayment">Monthly Payment (USD) <span className="text-destructive">*</span></Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                  <Input
+                    id="rtoMonthlyPayment"
+                    type="number"
+                    placeholder="0"
+                    className="pl-7"
+                    {...register("rtoMonthlyPayment")}
+                  />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="rtoTermMonths">Term Length (Months) <span className="text-destructive">*</span></Label>
+                <select
+                  id="rtoTermMonths"
+                  {...register("rtoTermMonths")}
+                  className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="">Select term...</option>
+                  {[12, 18, 24, 36, 48, 60].map((m) => (
+                    <option key={m} value={m}>{m} months ({Math.round(m / 12 * 10) / 10} yr)</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="rtoDownPayment">Down Payment (USD)</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                <Input
+                  id="rtoDownPayment"
+                  type="number"
+                  placeholder="0 (optional)"
+                  className="pl-7 max-w-48"
+                  {...register("rtoDownPayment")}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">Leave blank if no down payment is required.</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Location */}
       <Card>

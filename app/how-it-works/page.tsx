@@ -34,7 +34,7 @@ const SELLER_STEPS = [
     step: "3",
     icon: DollarSign,
     title: "Secure Escrow Payout",
-    desc: "Once a buyer completes payment, funds are held in escrow. When they confirm receipt, BoxPort releases your payout minus the 4.9% fee.",
+    desc: "Once a buyer completes payment, funds are held in escrow. When they confirm receipt, BoxPort releases your payout minus a flat success fee.",
   },
 ];
 
@@ -69,7 +69,7 @@ const ESCROW_STEPS = [
 const FAQS = [
   {
     q: "Is it really free to list?",
-    a: "Yes. Creating a listing costs nothing. BoxPort only earns a 4.9% fee when a sale is completed — never on listings, offers, or inquiries.",
+    a: "Yes. Creating a listing costs nothing. BoxPort only charges a flat success fee when a sale is completed — never on listings, offers, or inquiries.",
   },
   {
     q: "What if the container doesn't match the description?",
@@ -220,12 +220,12 @@ export default function HowItWorksPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center space-y-4">
           <h2 className="text-2xl font-bold">Transparent Fees — No Surprises</h2>
           <p className="text-muted-foreground">
-            BoxPort charges a flat <strong>4.9% platform fee</strong> on completed sales only. Listings, offers, and inquiries are always free.
+            Sellers pay a flat success fee only when their container sells. Listings, offers, and inquiries are always free.
           </p>
           <div className="inline-block bg-background border border-border rounded-xl px-6 py-4 text-sm">
-            Example: $5,000 sale → seller receives{" "}
-            <strong className="text-foreground">$4,755</strong> · BoxPort fee:{" "}
-            <strong className="text-foreground">$245</strong>
+            Used containers: <strong className="text-foreground">$49 flat</strong> ·
+            New containers: <strong className="text-foreground">$69 flat</strong> ·
+            Rent-to-Own: <strong className="text-foreground">$99 flat</strong>
           </div>
           <div className="pt-2">
             <Button asChild variant="outline" size="sm">

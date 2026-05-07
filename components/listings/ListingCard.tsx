@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Eye, Star } from "lucide-react";
+import { MapPin, Eye, Star, CalendarClock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ConditionBadge } from "./ConditionBadge";
@@ -33,7 +33,15 @@ export function ListingCard({ listing }: ListingCardProps) {
               <div className="text-muted-foreground text-4xl">📦</div>
             </div>
           )}
-          {listing.isFeatured && (
+          {listing.listingType === "rent_to_own" && (
+            <div className="absolute top-2 left-2">
+              <Badge className="bg-purple-600 text-white text-xs font-semibold">
+                <CalendarClock className="w-3 h-3 mr-1" />
+                Rent-to-Own
+              </Badge>
+            </div>
+          )}
+          {listing.isFeatured && listing.listingType !== "rent_to_own" && (
             <div className="absolute top-2 left-2">
               <Badge className="bg-accent text-accent-foreground text-xs font-semibold">
                 <Star className="w-3 h-3 mr-1" />
@@ -51,9 +59,25 @@ export function ListingCard({ listing }: ListingCardProps) {
         <CardContent className="p-4">
           {/* Price */}
           <div className="flex items-start justify-between mb-2">
-            <span className="text-2xl font-bold text-foreground">
-              {formatCurrency(Number(listing.price))}
-            </span>
+            <div>
+              {listing.listingType === "rent_to_own" && listing.rtoMonthlyPayment ? (
+                <>
+                  <span className="text-2xl font-bold text-foreground">
+                    {formatCurrency(Number(listing.rtoMonthlyPayment))}
+                    <span className="text-sm font-normal text-muted-foreground">/mo</span>
+                  </span>
+                  {listing.rtoTermMonths && (
+                    <p className="text-xs text-muted-foreground">
+                      {listing.rtoTermMonths} mo · {formatCurrency(Number(listing.price))} total
+                    </p>
+                  )}
+                </>
+              ) : (
+                <span className="text-2xl font-bold text-foreground">
+                  {formatCurrency(Number(listing.price))}
+                </span>
+              )}
+            </div>
             <ConditionBadge condition={listing.condition} />
           </div>
 

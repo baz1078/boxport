@@ -26,9 +26,10 @@ export function Footer() {
             <ul className="space-y-2">
               {[
                 { href: "/listings", label: "Browse Containers" },
-                { href: "/listings?condition=one_trip", label: "One-Trip Containers" },
-                { href: "/listings?type=reefer", label: "Reefer Containers" },
-                { href: "/listings?type=40ft_high_cube", label: "40ft High Cube" },
+                { href: "/listings?category=new", label: "New Containers" },
+                { href: "/listings?category=used", label: "Used Containers" },
+                { href: "/listings?category=rent-to-own", label: "Rent-to-Own" },
+                { href: "/logistics", label: "Find a Carrier" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -45,8 +46,9 @@ export function Footer() {
             <ul className="space-y-2">
               {[
                 { href: "/auth/register", label: "Start Selling" },
-                { href: "/pricing", label: "Pricing & Plans" },
+                { href: "/pricing", label: "Pricing" },
                 { href: "/how-it-works", label: "How It Works" },
+                { href: "/logistics/join", label: "Join as a Carrier" },
                 { href: "/dashboard", label: "Seller Dashboard" },
               ].map((link) => (
                 <li key={link.href}>
@@ -83,7 +85,7 @@ export function Footer() {
             © {new Date().getFullYear()} BoxPort. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground">
-            A 4.9% fee applies to all transactions. Listings are free.
+            Flat seller fee on completed sales only. Listings are always free.
           </p>
         </div>
       </div>

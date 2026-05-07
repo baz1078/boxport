@@ -142,6 +142,12 @@ export const listings = pgTable(
     yearManufactured: integer("year_manufactured"),
     weightCapacityLbs: integer("weight_capacity_lbs"),
     conditionNotes: text("condition_notes"),
+    listingType: text("listing_type", { enum: ["sale", "rent_to_own"] })
+      .notNull()
+      .default("sale"),
+    rtoMonthlyPayment: numeric("rto_monthly_payment", { precision: 12, scale: 2 }),
+    rtoTermMonths: integer("rto_term_months"),
+    rtoDownPayment: numeric("rto_down_payment", { precision: 12, scale: 2 }),
     soldAt: timestamp("sold_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -153,6 +159,7 @@ export const listings = pgTable(
     index("idx_listings_condition").on(table.condition),
     index("idx_listings_state").on(table.state),
     index("idx_listings_created_at").on(table.createdAt),
+    index("idx_listings_listing_type").on(table.listingType),
   ]
 );
 
@@ -279,6 +286,26 @@ export const featuredBoosts = pgTable("featured_boosts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const carriers = pgTable("carriers", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .references(() => userProfiles.id, { onDelete: "cascade" }),
+  businessName: text("business_name").notNull(),
+  contactName: text("contact_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  dotNumber: text("dot_number"),
+  serviceAreas: text("service_areas").notNull(), // comma-separated state codes
+  equipmentTypes: text("equipment_types").notNull(), // comma-separated
+  serviceRadiusMiles: integer("service_radius_miles"),
+  bio: text("bio"),
+  website: text("website"),
+  isVerified: boolean("is_verified").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const notifications = pgTable("notifications", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: text("user_id")
@@ -350,6 +377,7 @@ export type User = typeof users.$inferSelect;
 export type UserProfile = typeof userProfiles.$inferSelect;
 export type Listing = typeof listings.$inferSelect;
 export type ListingImage = typeof listingImages.$inferSelect;
+export type Carrier = typeof carriers.$inferSelect;
 export type Offer = typeof offers.$inferSelect;
 export type Transaction = typeof transactions.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
