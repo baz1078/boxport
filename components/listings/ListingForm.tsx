@@ -19,7 +19,7 @@ import { Loader2, Info } from "lucide-react";
 
 const listingSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").max(100),
-  listingType: z.enum(["sale", "rent_to_own"]).default("sale"),
+  listingType: z.enum(["sale", "rent_to_own"]),
   containerType: z.string().min(1, "Please select a container type"),
   condition: z.string().min(1, "Please select a condition"),
   price: z.string().min(1, "Price is required").refine((v) => !isNaN(Number(v)) && Number(v) > 0, "Price must be greater than 0"),
