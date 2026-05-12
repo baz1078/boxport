@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { listings, userProfiles } from "@/lib/db/schema";
+import { listings, userProfiles, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { AdminListingForm } from "@/components/admin/AdminListingForm";
 import Link from "next/link";
@@ -26,9 +26,17 @@ export default async function AdminEditListingPage({ params }: PageProps) {
 
   if (!listing) notFound();
 
-  const sellers = await db.query.userProfiles.findMany({
+  const allProfiles = await db.query.userProfiles.findMany({
     orderBy: (up, { asc }) => [asc(up.fullName)],
   });
+  const allUsers = await db.query.users.findMany();
+  const userEmailMap = Object.fromEntries(allUsers.map((u) => [u.id, u.email]));
+  const sellers = allProfiles.map((p) => ({
+    id: p.id,
+    fullName: p.fullName || "No name",
+    businessName: p.businessName,
+    email: userEmailMap[p.id] ?? null,
+  }));
 
   const initialData = {
     id: listing.id,
