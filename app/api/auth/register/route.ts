@@ -4,6 +4,7 @@ import { users, accounts, userProfiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { sendSellerWelcomeEmail, addToLoops } from "@/lib/email";
 
 const registerSchema = z.object({
   name: z.string().min(2),
@@ -57,6 +58,12 @@ export async function POST(req: NextRequest) {
       fullName: name,
       isProfileComplete: false,
     });
+
+    // Fire-and-forget emails — never block or fail registration
+    void Promise.allSettled([
+      sendSellerWelcomeEmail(email, name),
+      addToLoops(email, name, "seller"),
+    ]).catch(() => {/* silently ignore */});
 
     return NextResponse.json({ success: true, userId: newUser.id }, { status: 201 });
   } catch (error) {
