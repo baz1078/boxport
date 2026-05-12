@@ -77,6 +77,9 @@ export default async function AdminListingsPage() {
                     {listing.status}
                   </span>
                   <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/listings/${listing.id}/edit`}>Edit</Link>
+                  </Button>
+                  <Button asChild variant="ghost" size="sm">
                     <Link href={`/listings/${listing.slug}`} target="_blank">View</Link>
                   </Button>
                 </div>

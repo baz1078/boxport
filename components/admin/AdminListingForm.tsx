@@ -35,6 +35,7 @@ const listingSchema = z.object({
   rtoMonthlyPayment: z.string().optional(),
   rtoTermMonths: z.string().optional(),
   rtoDownPayment: z.string().optional(),
+  status: z.enum(["draft", "active", "paused", "pending", "sold"]).optional(),
 });
 
 type FormData = z.infer<typeof listingSchema>;
@@ -46,10 +47,49 @@ interface Seller {
   email: string | null;
 }
 
-export function AdminListingForm({ sellers }: { sellers: Seller[] }) {
+interface InitialData {
+  id: string;
+  sellerId: string;
+  title: string;
+  listingType: "sale" | "rent_to_own";
+  containerType: string;
+  condition: string;
+  price: string;
+  allowOffers: boolean;
+  buyNowEnabled: boolean;
+  description?: string;
+  conditionNotes?: string;
+  city: string;
+  state: string;
+  zip: string;
+  yearManufactured?: string;
+  rtoMonthlyPayment?: string;
+  rtoTermMonths?: string;
+  rtoDownPayment?: string;
+  status: string;
+  images: { url: string; key: string; isPrimary: boolean }[];
+}
+
+interface Props {
+  sellers: Seller[];
+  initialData?: InitialData;
+  mode?: "create" | "edit";
+}
+
+const STATUS_OPTIONS = [
+  { value: "active", label: "Active" },
+  { value: "paused", label: "Paused" },
+  { value: "draft", label: "Draft" },
+  { value: "pending", label: "Pending" },
+  { value: "sold", label: "Sold" },
+] as const;
+
+export function AdminListingForm({ sellers, initialData, mode = "create" }: Props) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState<{ url: string; key: string }[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<{ url: string; key: string }[]>(
+    initialData?.images?.map((img) => ({ url: img.url, key: img.key })) ?? []
+  );
 
   const {
     register,
@@ -60,13 +100,24 @@ export function AdminListingForm({ sellers }: { sellers: Seller[] }) {
   } = useForm<FormData>({
     resolver: zodResolver(listingSchema),
     defaultValues: {
-      allowOffers: true,
-      buyNowEnabled: true,
-      listingType: "sale" as const,
-      sellerId: "",
-      containerType: "",
-      condition: "",
-      state: "",
+      allowOffers: initialData?.allowOffers ?? true,
+      buyNowEnabled: initialData?.buyNowEnabled ?? true,
+      listingType: initialData?.listingType ?? "sale",
+      sellerId: initialData?.sellerId ?? "",
+      containerType: initialData?.containerType ?? "",
+      condition: initialData?.condition ?? "",
+      state: initialData?.state ?? "",
+      title: initialData?.title ?? "",
+      price: initialData?.price ?? "",
+      description: initialData?.description ?? "",
+      conditionNotes: initialData?.conditionNotes ?? "",
+      city: initialData?.city ?? "",
+      zip: initialData?.zip ?? "",
+      yearManufactured: initialData?.yearManufactured ?? "",
+      rtoMonthlyPayment: initialData?.rtoMonthlyPayment ?? "",
+      rtoTermMonths: initialData?.rtoTermMonths ?? "",
+      rtoDownPayment: initialData?.rtoDownPayment ?? "",
+      status: (initialData?.status as FormData["status"]) ?? "active",
     },
   });
 
@@ -80,8 +131,11 @@ export function AdminListingForm({ sellers }: { sellers: Seller[] }) {
 
     setIsLoading(true);
     try {
-      const res = await fetch("/api/admin/listings", {
-        method: "POST",
+      const url = mode === "edit" ? `/api/admin/listings/${initialData!.id}` : "/api/admin/listings";
+      const method = mode === "edit" ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
@@ -97,11 +151,11 @@ export function AdminListingForm({ sellers }: { sellers: Seller[] }) {
       const result = await res.json();
 
       if (!res.ok) {
-        toast.error(result.error || "Failed to create listing");
+        toast.error(result.error || "Failed to save listing");
         return;
       }
 
-      toast.success("Listing created and published for seller!");
+      toast.success(mode === "edit" ? "Listing updated!" : "Listing created and published for seller!");
       router.push("/admin/listings");
     } catch {
       toast.error("Something went wrong. Please try again.");
@@ -112,19 +166,22 @@ export function AdminListingForm({ sellers }: { sellers: Seller[] }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Seller Selector */}
+      {/* Seller */}
       <Card className="border-primary/30 bg-primary/5">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <User className="h-4 w-4 text-primary" />
-            Select Seller <span className="text-destructive">*</span>
+            {mode === "edit" ? "Seller" : <>Select Seller <span className="text-destructive">*</span></>}
           </CardTitle>
-          <p className="text-sm text-muted-foreground">Choose which seller account this listing will be posted under.</p>
+          <p className="text-sm text-muted-foreground">
+            {mode === "edit" ? "Seller cannot be changed after creation." : "Choose which seller account this listing will be posted under."}
+          </p>
         </CardHeader>
         <CardContent>
           <select
             {...register("sellerId")}
-            className={`w-full text-sm border rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-ring ${errors.sellerId ? "border-destructive" : "border-border"}`}
+            disabled={mode === "edit"}
+            className={`w-full text-sm border rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 disabled:cursor-not-allowed ${errors.sellerId ? "border-destructive" : "border-border"}`}
           >
             <option value="">Select a seller...</option>
             {sellers.map((s) => (
@@ -377,6 +434,26 @@ export function AdminListingForm({ sellers }: { sellers: Seller[] }) {
         </CardContent>
       </Card>
 
+      {/* Status (edit only) */}
+      {mode === "edit" && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Listing Status</CardTitle>
+            <p className="text-sm text-muted-foreground">Control visibility and availability of this listing.</p>
+          </CardHeader>
+          <CardContent>
+            <select
+              {...register("status")}
+              className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-ring max-w-xs"
+            >
+              {STATUS_OPTIONS.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Submit */}
       <div className="flex gap-3 pb-8">
         <Button type="button" variant="outline" onClick={() => router.back()} disabled={isLoading}>
@@ -384,9 +461,9 @@ export function AdminListingForm({ sellers }: { sellers: Seller[] }) {
         </Button>
         <Button type="submit" className="bg-primary hover:bg-primary/90 text-white font-semibold px-8" disabled={isLoading}>
           {isLoading ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Publishing...</>
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {mode === "edit" ? "Saving..." : "Publishing..."}</>
           ) : (
-            "Publish Listing for Seller"
+            mode === "edit" ? "Save Changes" : "Publish Listing for Seller"
           )}
         </Button>
       </div>
