@@ -150,33 +150,35 @@ export default async function HomePage() {
       </section>
 
       {/* New Containers Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-bold">New Containers</h2>
-            <p className="text-muted-foreground text-xs mt-0.5">One-trip, factory-fresh</p>
+      <section className="w-full py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-bold">New Containers</h2>
+              <p className="text-muted-foreground text-xs mt-0.5">One-trip, factory-fresh</p>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/listings?category=new">View All <ArrowRight className="ml-2 h-3 w-3" /></Link>
+            </Button>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/listings?category=new">View All <ArrowRight className="ml-2 h-3 w-3" /></Link>
-          </Button>
+          {newListings.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {newListings.map((listing) => (
+                <ListingCard key={listing.id} listing={listing as any} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 border-2 border-dashed border-border rounded-xl">
+              <Package className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">No new containers listed yet</p>
+            </div>
+          )}
         </div>
-        {newListings.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {newListings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing as any} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 border-2 border-dashed border-border rounded-xl">
-            <Package className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">No new containers listed yet</p>
-          </div>
-        )}
       </section>
 
       {/* Used Containers Section */}
-      <section className="bg-muted/20 border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <section className="w-full py-12 bg-muted/20 border-y border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl font-bold">Used Containers</h2>
@@ -202,28 +204,30 @@ export default async function HomePage() {
       </section>
 
       {/* Rent-to-Own Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-bold">Rent-to-Own</h2>
-            <p className="text-muted-foreground text-xs mt-0.5">Monthly payments → full ownership</p>
+      <section className="w-full py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-bold">Rent-to-Own</h2>
+              <p className="text-muted-foreground text-xs mt-0.5">Monthly payments → full ownership</p>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/listings?category=rent-to-own">View All <ArrowRight className="ml-2 h-3 w-3" /></Link>
+            </Button>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/listings?category=rent-to-own">View All <ArrowRight className="ml-2 h-3 w-3" /></Link>
-          </Button>
+          {rtoListings.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {rtoListings.map((listing) => (
+                <ListingCard key={listing.id} listing={listing as any} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 border-2 border-dashed border-border rounded-xl">
+              <Package className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">No rent-to-own listings yet</p>
+            </div>
+          )}
         </div>
-        {rtoListings.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {rtoListings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing as any} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 border-2 border-dashed border-border rounded-xl">
-            <Package className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">No rent-to-own listings yet</p>
-          </div>
-        )}
       </section>
 
       {/* How It Works */}
