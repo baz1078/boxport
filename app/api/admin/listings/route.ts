@@ -9,6 +9,7 @@ import { generateSlug } from "@/lib/utils/formatters";
 const schema = z.object({
   sellerId: z.string().min(1),
   title: z.string().min(5).max(100),
+  listingType: z.enum(["sale", "rent_to_own"]).default("sale"),
   containerType: z.string(),
   condition: z.string(),
   price: z.number().positive(),
@@ -20,6 +21,9 @@ const schema = z.object({
   state: z.string(),
   zip: z.string(),
   yearManufactured: z.number().optional(),
+  rtoMonthlyPayment: z.number().optional(),
+  rtoTermMonths: z.number().optional(),
+  rtoDownPayment: z.number().optional(),
   images: z.array(z.object({ url: z.string(), key: z.string() })),
 });
 
@@ -61,6 +65,7 @@ export async function POST(req: NextRequest) {
         sellerId: data.sellerId,
         title: data.title,
         slug,
+        listingType: data.listingType,
         containerType: data.containerType as any,
         condition: data.condition as any,
         price: data.price.toString(),
@@ -72,6 +77,9 @@ export async function POST(req: NextRequest) {
         state: data.state,
         zip: data.zip,
         yearManufactured: data.yearManufactured,
+        rtoMonthlyPayment: data.rtoMonthlyPayment?.toString(),
+        rtoTermMonths: data.rtoTermMonths,
+        rtoDownPayment: data.rtoDownPayment?.toString(),
         status: "active",
       })
       .returning();
