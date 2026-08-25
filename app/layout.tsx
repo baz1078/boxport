@@ -60,6 +60,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://boxport.io",
   },
+  verification: {
+    google: "p7IKvHsN5GxoA_ChVEVyaiSYgTt8zzqCqMtBO_yc7EM",
+  },
 };
 
 export default function RootLayout({
@@ -71,7 +74,7 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <head>
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-JG21CPXZCE"
+          src="https://www.googletagmanager.com/gtag/js?id=G-3N8D31ZRE6"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -79,7 +82,7 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-JG21CPXZCE');
+            gtag('config', 'G-3N8D31ZRE6');
           `}
         </Script>
       </head>
